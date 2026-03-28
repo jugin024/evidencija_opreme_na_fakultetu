@@ -1,13 +1,16 @@
-<script setup>
-
+<script>
+export default {
+  name: 'App'
+}
 </script>
 
 
 
 
 <template>
-  <div>
-    Test proba 123
+  <div id="app">
+    navigacijski bar to be
+    <router-view></router-view>
   </div>
 </template>
 
