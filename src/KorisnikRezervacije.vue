@@ -7,6 +7,6 @@
 
 <script>
 export default {
-  name: 'KorisnikiRezervacije'
-}
+  name: "KorisnikiRezervacije",
+};
 </script>
