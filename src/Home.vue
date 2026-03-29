@@ -1,6 +1,6 @@
 <template>
-  <div class="row">
-    <div class="col-md-6">
+  <div class="row justify-content-center">
+    <div class="col-md-6" v-if="prikaziPrijavu">
       <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">
           <h4 class="mb-0">Prijava</h4>
@@ -31,12 +31,17 @@
               Prijavi se
             </button>
           </form>
+
+          <div class="mt-3 text-center">
+            <a href="#" @click.prevent="prikaziPrijavu = false"
+              >Nemate račun? Registrirajte se.</a
+            >
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Desna kolona: Registracija -->
-    <div class="col-md-6">
+    <div class="col-md-6" v-else>
       <div class="card mb-4 shadow-sm">
         <div class="card-header bg-success text-white">
           <h4 class="mb-0">Registracija</h4>
@@ -73,11 +78,20 @@
                 minlength="8"
                 required
               />
+              <small class="form-text text-muted"
+                >Lozinka mora imati min. 8 znakova, veliko slovo, broj i
+                specijalan znak.</small
+              >
             </div>
             <button type="submit" class="btn btn-success btn-block">
               Registriraj se
             </button>
           </form>
+          <div class="mt-3 text-center">
+            <a href="#" @click.prevent="prikaziPrijavu = true"
+              >Imate račun? Prijavite se.</a
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -89,6 +103,7 @@ export default {
   name: "Home",
   data() {
     return {
+      prikaziPrijavu: true,
       loginEmail: "",
       loginLozinka: "",
 
@@ -104,13 +119,33 @@ export default {
       this.$router.push("/oprema");
     },
     registrirajKorisnika() {
+      if (!this.regEmail.includes("@")) {
+        alert("greska: Email mora imati @!");
+        return;
+      }
+      if (this.regLozinka.length < 8) {
+        alert("greška: lozinka mora imati barem 8 znakova!");
+        return;
+      }
+      let imaVelikoSlovo = /[A-Z]/.test(this.regLozinka);
+      let imaBroj = /[0-9]/.test(this.regLozinka);
+      let imaSpecijalniZnak = /[",!#$%&/()=?*\\|@{}<>¤]/.test(this.regLozinka);
+
+      if (!imaVelikoSlovo || !imaBroj || !imaSpecijalniZnak) {
+        alert(
+          "Greška: lozinka mora imat barem jedno veliko slovo, jedan broj te jedan specijalni znak!"
+        );
+        return;
+      }
+
       console.log("Registracija ime+mail", this.regIme, this.regEmail);
 
-      alert("Registracija prošla");
+      alert("Registracija prošla, prijavite se");
 
       this.regIme = "";
       this.regEmail = "";
       this.regLozinka = "";
+      this.prikaziPrijavu = true;
     },
   },
 };
