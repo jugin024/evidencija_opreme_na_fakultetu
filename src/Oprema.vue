@@ -1,19 +1,20 @@
 <template>
   <div>
     <h2 class="mb-2">Dostupna oprema</h2>
-    <!--JOŠ NE RADI -->
+    <!--VALJDA RADI -->
     <div class="form-group mb-4">
       <input
+        v-model="pojamZaPretragu"
         type="text"
         class="form-control"
-        placeholder="Pretraži opremu po nazivu..."
+        placeholder="Pretraži opremu..."
       />
     </div>
 
     <div class="row">
       <div
         class="col-md-4 mb-4"
-        v-for="predmet in dostupnaOprema"
+        v-for="predmet in filtriranaOprema"
         :key="predmet.id"
       >
         <div class="card h-100 shadow-sm">
@@ -43,6 +44,7 @@
             <button
               class="btn btn-primary mt-auto"
               :disabled="!predmet.ispravno"
+              @click="idiNaRezervaciju(predmet.naziv)"
             >
               Zatraži rezervaciju
             </button>
@@ -58,6 +60,7 @@ export default {
   name: "Oprema",
   data() {
     return {
+      pojamZaPretragu: "",
       //dummy podaci
       dostupnaOprema: [
         {
@@ -136,6 +139,23 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    filtriranaOprema() {
+      return this.dostupnaOprema.filter((predmet) => {
+        return predmet.naziv
+          .toLowerCase()
+          .includes(this.pojamZaPretragu.toLowerCase());
+      });
+    },
+  },
+  methods: {
+    idiNaRezervaciju(biraniNaziv) {
+      this.$router.push({
+        path: "/rezervacije",
+        query: { oprema: biraniNaziv }, // Šaljemo naziv opreme u URL-u!
+      });
+    },
   },
 };
 </script>
