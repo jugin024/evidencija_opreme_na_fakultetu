@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 class="mb-4 text-center">Zahtjev za rezervaciju</h2>
-    <div class="card shadow-sm col-md-6 mx-auto p-4">
+    <div class="card shadow-sm col-md-6 mx-auto p-4 mb-5">
       <form @submit.prevent="posaljiZahtjev">
         <div class="form-group">
           <label class="font-weight-bold">Odabrana oprema:</label>
@@ -14,18 +14,69 @@
         </div>
 
         <div class="form-group">
-          <label class="font-weight-bold">Datum OD:</label>
-          <input type="date" class="form-control" v-model="datumOd" required />
+          <label class="font-weight-bold">Datum preuzimanja (OD):</label>
+          <input
+            type="date"
+            class="form-control"
+            v-model="datumOd"
+            :min="danasnjiDatum"
+            required
+          />
         </div>
+        <div class="form-check mb-3">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="istiDanCheck"
+            v-model="istiDan"
+            @change="IstiDanProvjera"
+          />
 
+          <label class="form-check-label text-primary" for="istiDanCheck">
+            Oprema se vraća isti dan
+          </label>
+        </div>
         <div class="form-group">
-          <label class="font-weight-bold">Datum DO:</label>
-          <input type="date" class="form-control" v-model="datumDo" required />
+          <label class="font-weight-bold">Datum povrata (DO)</label>
+          <input
+            type="date"
+            class="form-control"
+            v-model="datumDo"
+            :min="datumOd || danasnjiDatum"
+            :readonly="istiDan"
+            required
+          />
         </div>
-
-        <button type="submit" class="btn btn-success btn-block mt-4">
-          Potvrdi podatke i pošalji zahtjev
-        </button>
+        <div class="row">
+          <div class="col-md-6 form-group">
+            <label class="font-weight-bold">Vrijeme od:</label>
+            <input
+              type="time"
+              class="form-control"
+              v-model="vrijemeOd"
+              required
+            />
+          </div>
+          <div class="col-md-6 form-group">
+            <label class="font-weight-bold">Vrijeme do:</label>
+            <input
+              type="time"
+              class="form-control"
+              v-model="vrijemeDo"
+              required
+            />
+          </div>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="$router.push('/oprema')"
+          >
+            Odustani
+          </button>
+          <button type="submit" class="btn btn-success">Potvrdi zahtjev</button>
+        </div>
       </form>
     </div>
   </div>
@@ -39,21 +90,56 @@ export default {
       odabranaOprema: this.$route.query.oprema || "Nije odabrana oprema",
       datumOd: "",
       datumDo: "",
+      istiDan: false,
+      vrijemeOd: "",
+      vrijemeDo: "",
+      danasnjiDatum: new Date().toISOString().split("T")[0],
     };
+  },
+  watch: {
+    datumOd(noviDatum) {
+      if (this.istiDan) {
+        this.datumDo = noviDatum;
+      }
+    },
   },
   methods: {
     posaljiZahtjev() {
-      alert(
-        `Vaš zahtjev je zaprimljen!\n\nOprema: ${this.odabranaOprema}\nOd: ${this.datumOd}\nDo: ${this.datumDo}`
-      );
+      const timestampKreiranja = new Date().toISOString();
+
+      const poruka = `
+    [SLANJE U BAZU]
+    Oprema: ${this.odabranaOprema}
+    Preuzimanje: ${this.formatiranjeDatuma(this.datumOd)} u ${this.vrijemeOd}h
+    Povrat: ${this.formatiranjeDatuma(this.datumDo)} u ${this.vrijemeDo}h
+    Kreirano (Timestamp): ${timestampKreiranja}
+      `;
+      alert(poruka);
       this.$router.push("/oprema");
+    },
+
+    IstiDanProvjera() {
+      if (this.istiDan) {
+        this.datumDo = this.datumOd;
+      }
+    },
+
+    formatiranjeDatuma(htmlDatum) {
+      if (!htmlDatum) return "";
+      const [godina, mjesec, dan] = htmlDatum.split("-");
+      return `${dan}.${mjesec}.${godina}.`;
     },
   },
 };
 </script>
 
 <style scoped>
-.card {
-  margin-top: 20px;
+.form-check-label {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form-check-input {
+  cursor: pointer;
 }
 </style>

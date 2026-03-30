@@ -1,7 +1,6 @@
 <template>
   <div>
     <h2 class="mb-2">Dostupna oprema</h2>
-    <!--VALJDA RADI -->
     <div class="form-group mb-4">
       <input
         v-model="pojamZaPretragu"
@@ -153,7 +152,7 @@ export default {
     idiNaRezervaciju(biraniNaziv) {
       this.$router.push({
         path: "/rezervacije",
-        query: { oprema: biraniNaziv }, // Šaljemo naziv opreme u URL-u!
+        query: { oprema: biraniNaziv },
       });
     },
   },
