@@ -99,6 +99,7 @@
 </template>
 
 <script>
+import { auth, db } from "./firebase.js";
 export default {
   name: "Home",
   data() {
@@ -114,9 +115,14 @@ export default {
   },
   methods: {
     prijaviKorisnika() {
-      console.log("Prijava mail", this.loginEmail);
-
-      this.$router.push("/oprema");
+      auth
+        .signInWithEmailAndPassword(this.loginEmail, this.loginLozinka)
+        .then(() => {
+          this.$router.push("/oprema");
+        })
+        .catch(function (error) {
+          alert("greška pri prijavi " + error.message);
+        });
     },
     registrirajKorisnika() {
       if (!this.regEmail.includes("@")) {
@@ -139,13 +145,24 @@ export default {
       }
 
       console.log("Registracija ime+mail", this.regIme, this.regEmail);
-
-      alert("Registracija prošla, prijavite se");
-
-      this.regIme = "";
-      this.regEmail = "";
-      this.regLozinka = "";
-      this.prikaziPrijavu = true;
+      auth
+        .createUserWithEmailAndPassword(this.regEmail, this.regLozinka)
+        .then((rezultat) => {
+          db.collection("korisnici")
+            .doc(rezultat.user.uid)
+            .set({
+              imePrezime: this.regIme,
+              email: this.regEmail,
+              uloga: "student",
+            })
+            .then(() => {
+              alert("Registracija uspješna, prijavite se");
+              this.regIme = "";
+              this.regEmail = "";
+              this.regLozinka = "";
+              this.prikaziPrijavu = true;
+            });
+        });
     },
   },
 };
