@@ -186,7 +186,7 @@ export default {
 
       if (!imaVelikoSlovo || !imaBroj || !imaSpecijalniZnak) {
         alert(
-          "Greška: lozinka mora imat barem jedno veliko slovo, jedan broj te jedan specijalni znak!",
+          "Greška: lozinka mora imat barem jedno veliko slovo, jedan broj te jedan specijalni znak!"
         );
         return;
       }
@@ -203,12 +203,15 @@ export default {
               uloga: "student",
             })
             .then(() => {
-              this.regIme = "";
-              this.regEmail = "";
-              this.regLozinka = "";
-              this.prikaziPrijavu = true;
-              this.porukaUspjehPrijava =
-                "Registracija uspješna! Možete se prijaviti.";
+              auth.signOut().then(() => {
+                this.regIme = "";
+                this.regEmail = "";
+                this.regLozinka = "";
+                this.prikaziPrijavu = true;
+
+                this.porukaUspjehPrijava =
+                  "Registracija uspješna! Možete se prijaviti.";
+              });
             });
         });
     },
