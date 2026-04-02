@@ -6,6 +6,18 @@
           <h4 class="mb-0">Prijava</h4>
         </div>
         <div class="card-body">
+          <div
+            v-if="porukaGreskaPrijava"
+            class="alert alert-danger text-center font-weight-bold"
+          >
+            {{ porukaGreskaPrijava }}
+          </div>
+          <div
+            v-if="porukaUspjehPrijava"
+            class="alert alert-success text-center font-weight-bold"
+          >
+            {{ porukaUspjehPrijava }}
+          </div>
           <form @submit.prevent="prijaviKorisnika">
             <div class="form-group">
               <label>Email adresa</label>
@@ -33,7 +45,7 @@
           </form>
 
           <div class="mt-3 text-center">
-            <a href="#" @click.prevent="prikaziPrijavu = false"
+            <a href="#" @click.prevent="prebaciNaRegistraciju"
               >Nemate račun? Registrirajte se.</a
             >
           </div>
@@ -47,6 +59,12 @@
           <h4 class="mb-0">Registracija</h4>
         </div>
         <div class="card-body">
+          <div
+            v-if="porukaGreskaReg"
+            class="alert alert-danger text-center font-weight-bold"
+          >
+            {{ porukaGreskaReg }}
+          </div>
           <form @submit.prevent="registrirajKorisnika">
             <div class="form-group">
               <label>Ime i prezime</label>
@@ -88,7 +106,7 @@
             </button>
           </form>
           <div class="mt-3 text-center">
-            <a href="#" @click.prevent="prikaziPrijavu = true"
+            <a href="#" @click.prevent="prebaciNaPrijavu"
               >Imate račun? Prijavite se.</a
             >
           </div>
@@ -105,6 +123,11 @@ export default {
   data() {
     return {
       prikaziPrijavu: true,
+
+      porukaGreskaPrijava: "",
+      porukaUspjehPrijava: "",
+      porukaGreskaReg: "",
+
       loginEmail: "",
       loginLozinka: "",
 
@@ -114,17 +137,41 @@ export default {
     };
   },
   methods: {
+    prebaciNaRegistraciju() {
+      this.prikaziPrijavu = false;
+      this.porukaGreskaPrijava = "";
+      this.porukaUspjehPrijava = "";
+    },
+    prebaciNaPrijavu() {
+      this.prikaziPrijavu = true;
+      this.porukaGreskaReg = "";
+    },
+
     prijaviKorisnika() {
+      this.porukaGreskaPrijava = "";
+      this.porukaUspjehPrijava = "";
+      console.log("Pokušaj prijave:", this.loginEmail);
+
       auth
         .signInWithEmailAndPassword(this.loginEmail, this.loginLozinka)
         .then(() => {
+          this.porukaUspjehPrijava = "Prijava uspješna! Preusmjeravanje";
           this.$router.push("/oprema");
         })
-        .catch(function (error) {
-          alert("greška pri prijavi " + error.message);
+        .catch((error) => {
+          if (
+            error.message.includes("INVALID_LOGIN_CREDENTIALS") ||
+            error.message.includes("user-not-found") ||
+            error.message.includes("wrong-password")
+          ) {
+            this.porukaGreskaPrijava = "Pogrešan email ili lozinka!";
+          }
         });
     },
+
     registrirajKorisnika() {
+      this.porukaGreskaReg = "";
+
       if (!this.regEmail.includes("@")) {
         alert("greska: Email mora imati @!");
         return;
@@ -139,7 +186,7 @@ export default {
 
       if (!imaVelikoSlovo || !imaBroj || !imaSpecijalniZnak) {
         alert(
-          "Greška: lozinka mora imat barem jedno veliko slovo, jedan broj te jedan specijalni znak!"
+          "Greška: lozinka mora imat barem jedno veliko slovo, jedan broj te jedan specijalni znak!",
         );
         return;
       }
@@ -156,11 +203,12 @@ export default {
               uloga: "student",
             })
             .then(() => {
-              alert("Registracija uspješna, prijavite se");
               this.regIme = "";
               this.regEmail = "";
               this.regLozinka = "";
               this.prikaziPrijavu = true;
+              this.porukaUspjehPrijava =
+                "Registracija uspješna! Možete se prijaviti.";
             });
         });
     },
