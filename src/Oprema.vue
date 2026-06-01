@@ -55,89 +55,18 @@
 </template>
 
 <script>
+import { db } from "./firebase.js";
 export default {
   name: "Oprema",
   data() {
     return {
       pojamZaPretragu: "",
-      //dummy podaci
-      dostupnaOprema: [
-        {
-          id: 1,
-          naziv: "Projektor ACER H6546Ki, DLP, FHD 1920x1080px",
-          kategorija: "Projektori",
-          ispravno: true,
-        },
-        {
-          id: 2,
-          naziv: "Projektor ACER Vero PD2527i, DLP, FHD 1920x1200px",
-          kategorija: "Projektori",
-          ispravno: true,
-        },
-        // ubaciti napomene za admina tipa rezervirano samo za prof i asistente
-        {
-          id: 3,
-          naziv: "Projektor EPSON EB-L630U, 3LCD, 1920 x 1200",
-          kategorija: "Projektori",
-          ispravno: true,
-        },
-        {
-          id: 4,
-          naziv: "Laptop LENOVO ThinkPad E14 Gen 7",
-          kategorija: "Laptopi",
-          ispravno: true,
-        },
-        {
-          // napomena opisa kvara
-          id: 5,
-          naziv: "Laptop LENOVO ThinkPad X1 Carbon Gen 13",
-          kategorija: "Laptopi",
-          ispravno: false,
-        },
-        {
-          id: 6,
-          naziv: "Laptop APPLE MacBook Pro 16",
-          kategorija: "Laptopi",
-          ispravno: true,
-        },
-        {
-          id: 7,
-          naziv: "Laptop APPLE MacBook Pro 16",
-          kategorija: "Laptopi",
-          ispravno: true,
-        },
-        {
-          id: 8,
-          naziv: "Laptop APPLE MacBook Pro 14",
-          kategorija: "Laptopi",
-          ispravno: true,
-        },
-        {
-          id: 9,
-          naziv: "Web kamera LOGITECH Rally Bar",
-          kategorija: "Kamere",
-          ispravno: true,
-        },
-        {
-          id: 10,
-          naziv: "Konferencijska kamera LOGITECH CONNECT USB",
-          kategorija: "Kamere",
-          ispravno: true,
-        },
-        {
-          id: 11,
-          naziv: "Prezenter LOGITECH R400",
-          kategorija: "Ostalo",
-          ispravno: true,
-        },
-        {
-          id: 12,
-          naziv: "Prezenter LOGITECH Spotlight Slate",
-          kategorija: "Ostalo",
-          ispravno: true,
-        },
-      ],
+
+      dostupnaOprema: [],
     };
+  },
+  created() {
+    this.dohvatiOpremu();
   },
   computed: {
     filtriranaOprema() {
@@ -149,6 +78,26 @@ export default {
     },
   },
   methods: {
+    dohvatiOpremu() {
+      db.collection("oprema")
+        .get()
+        .then((snapshot) => {
+          const opremaIzBaze = [];
+          snapshot.forEach((doc) => {
+            opremaIzBaze.push({
+              id: doc.id,
+              naziv: doc.data().naziv,
+              kategorija: doc.data().kategorija,
+              ispravno: doc.data().ispravno,
+            });
+          });
+          this.dostupnaOprema = opremaIzBaze;
+        })
+        .catch((error) => {
+          console.log(error.code, error.message);
+        });
+    },
+
     idiNaRezervaciju(biraniNaziv) {
       this.$router.push({
         path: "/rezervacije",

@@ -32,7 +32,9 @@ export default {
   methods: {
     odjaviSe() {
       auth.signOut().then(() => {
-        this.$router.push("/");
+        if (this.$route.path !== "/") {
+          this.$router.push("/");
+        }
       });
     },
   },

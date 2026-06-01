@@ -156,16 +156,15 @@ export default {
         .signInWithEmailAndPassword(this.loginEmail, this.loginLozinka)
         .then(() => {
           this.porukaUspjehPrijava = "Prijava uspješna! Preusmjeravanje";
-          this.$router.push("/oprema");
+
+          if (this.$route.path !== "/oprema") {
+            this.$router.push("/oprema");
+          }
         })
         .catch((error) => {
-          if (
-            error.message.includes("INVALID_LOGIN_CREDENTIALS") ||
-            error.message.includes("user-not-found") ||
-            error.message.includes("wrong-password")
-          ) {
-            this.porukaGreskaPrijava = "Pogrešan email ili lozinka!";
-          }
+          console.log(error.code, error.message);
+
+          this.porukaGreskaPrijava = error.code + " - " + error.message;
         });
     },
 
