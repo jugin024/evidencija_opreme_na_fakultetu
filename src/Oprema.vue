@@ -17,7 +17,15 @@
         :key="predmet.id"
       >
         <div class="card h-100 shadow-sm">
+          <img
+            v-if="predmet.slikaUrl"
+            :src="predmet.slikaUrl"
+            :alt="predmet.naziv"
+            class="card-img-top"
+            style="height: 180px; object-fit: contain; background-color: gray"
+          />
           <div
+            v-else
             class="bg-secondary text-white text-center d-flex align-items-center justify-content-center"
             style="height: 180px"
           >
@@ -89,6 +97,7 @@ export default {
               naziv: doc.data().naziv,
               kategorija: doc.data().kategorija,
               ispravno: doc.data().ispravno,
+              slikaUrl: doc.data().slikaurl,
             });
           });
           this.dostupnaOprema = opremaIzBaze;
