@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { auth, db } from "./firebase.js";
 export default {
   name: "KorisnikRezervacije",
   data() {
@@ -107,6 +108,19 @@ export default {
     posaljiZahtjev() {
       const timestampKreiranja = new Date().toISOString();
 
+      const novaRezervacija = {
+        oprema: this.odabranaOprema,
+        datumOd: this.datumOd,
+        datumDo: this.datumDo,
+        vrijemeOd: this.vrijemeOd,
+        vrijemeDo: this.vrijemeDo,
+        status: "na_cekanju",
+        korisnikId: auth.currentUser.uid,
+        korisnikEmail: auth.currentUser.email,
+        kreirano: timestampKreiranja,
+      };
+      console.log("Slanje nove rezervacije - - -", novaRezervacija);
+
       const poruka = `
     [SLANJE U BAZU]
     Oprema: ${this.odabranaOprema}
@@ -114,6 +128,13 @@ export default {
     Povrat: ${this.formatiranjeDatuma(this.datumDo)} u ${this.vrijemeDo}h
     Kreirano (Timestamp): ${timestampKreiranja}
       `;
+
+      db.collection("rezervacije")
+        .add(novaRezervacija)
+        .then((novaRez) => {
+          console.log("Rezervacija spremljena - ID:", novaRez.id);
+        });
+
       alert(poruka);
       this.$router.push("/oprema");
     },

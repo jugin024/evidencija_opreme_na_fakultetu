@@ -22,7 +22,7 @@
             :src="predmet.slikaUrl"
             :alt="predmet.naziv"
             class="card-img-top"
-            style="height: 180px; object-fit: contain; background-color: gray"
+            style="height: 180px; object-fit: contain; background-color: white"
           />
           <div
             v-else
@@ -97,7 +97,7 @@ export default {
               naziv: doc.data().naziv,
               kategorija: doc.data().kategorija,
               ispravno: doc.data().ispravno,
-              slikaUrl: doc.data().slikaurl,
+              slikaUrl: doc.data().slikaUrl,
             });
           });
           this.dostupnaOprema = opremaIzBaze;
