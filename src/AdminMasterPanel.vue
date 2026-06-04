@@ -15,7 +15,7 @@
 
         <tbody>
           <tr v-for="zahtjev in zahtjevi" :key="zahtjev.id">
-            <td>{{ zahtjev.korisnik }}</td>
+            <td>{{ zahtjev.korisnikEmail }}</td>
             <td>{{ zahtjev.oprema }}</td>
             <td>{{ zahtjev.datumOd }} - {{ zahtjev.datumDo }}</td>
 
@@ -62,40 +62,42 @@
 </template>
 
 <script>
+import { db } from "./firebase";
+
 export default {
   name: "AdminMasterPanel",
   data() {
     return {
-      zahtjevi: [
-        {
-          id: 1,
-          korisnik: "Pero Perić",
-          oprema: "Web kamera LOGITECH Rally Bar",
-          datumOd: "15.05.2026",
-          datumDo: "18.05.2026",
-          status: "na_cekanju",
-        },
-        {
-          id: 2,
-          korisnik: "Ana Anić",
-          oprema: "Prezenter LOGITECH R400",
-          datumOd: "20.05.2026",
-          datumDo: "22.05.2026",
-          status: "na_cekanju",
-        },
-        {
-          id: 3,
-          korisnik: "Marko Marić",
-          oprema: "Laptop APPLE MacBook Pro 16",
-          datumOd: "10.05.2026",
-          datumDo: "12.05.2026",
-          status: "odobreno",
-        },
-      ],
+      zahtjevi: [],
     };
   },
+  created() {
+    this.dohvatiRezervacie();
+  },
   methods: {
+    dohvatiRezervacie() {
+      db.collection("rezervacije")
+        .get()
+        .then((snapshot) => {
+          const zahtjeviUnutarBaze = [];
+
+          snapshot.forEach((document) => {
+            zahtjeviUnutarBaze.push({
+              id: document.id,
+              korisnikEmail: document.data().korisnikEmail,
+              oprema: document.data().oprema,
+              datumOd: document.data().datumOd,
+              datumDo: document.data().datumDo,
+              status: document.data().status,
+            });
+          });
+
+          this.zahtjevi = zahtjeviUnutarBaze;
+        });
+    },
     promijeniStatus(id, noviStatus) {
+      db.collection("rezervacije").doc(id).update({ status: noviStatus });
+
       const pronadjeniZahtjev = this.zahtjevi.find((z) => z.id === id);
       if (pronadjeniZahtjev) {
         pronadjeniZahtjev.status = noviStatus;
